@@ -1,0 +1,201 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+h1 {
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: #e94560;
+  text-transform: uppercase;
+}
+
+#status {
+  font-size: 1.1rem;
+  min-height: 1.5em;
+  color: #ccc;
+}
+
+#controls {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  background: #16213e;
+  color: #e0e0e0;
+  border: 1px solid #e94560;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+button:hover { background: #e94560; color: #fff; }
+button.active { background: #e94560; color: #fff; }
+
+/* Legend */
+#legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  transition: opacity 0.3s;
+}
+#legend.hidden { opacity: 0; pointer-events: none; }
+.legend-bar {
+  width: 180px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #2196f3, #2196f388, transparent, #e9456088, #e94560);
+}
+.white-label { color: #2196f3; }
+.black-label { color: #e94560; }
+
+/* Board */
+#board-container { position: relative; }
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: min(85vw, 560px);
+  height: min(85vw, 560px);
+  border: 3px solid #0f3460;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: min(9vw, 56px);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.25s;
+}
+
+.square.light { background: #e8d5b5; }
+.square.dark  { background: #b58863; }
+
+.square.selected { box-shadow: inset 0 0 0 3px #e94560; z-index: 2; }
+
+.square.move-target::after {
+  content: '';
+  position: absolute;
+  width: 30%; height: 30%;
+  border-radius: 50%;
+  background: rgba(233, 69, 96, 0.45);
+  pointer-events: none;
+  z-index: 3;
+}
+.square.capture-target::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 3px solid rgba(233, 69, 96, 0.6);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.square .piece {
+  position: relative;
+  z-index: 4;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Heatmap overlay */
+.square .heatmap-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: background-color 0.3s;
+}
+
+/* Count badge */
+.square .count-badge {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  font-size: min(3vw, 13px);
+  font-weight: 700;
+  line-height: 1;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  display: none;
+}
+.square .count-badge.top-left {
+  top: 2px; left: 3px;
+  color: #2196f3;
+  text-shadow: 0 0 3px rgba(0,0,0,0.7);
+}
+.square .count-badge.bottom-right {
+  bottom: 2px; right: 3px;
+  color: #e94560;
+  text-shadow: 0 0 3px rgba(0,0,0,0.7);
+}
+.show-counts .count-badge { display: block; }
+
+/* Net count center badge */
+.square .count-net {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  font-size: min(3.5vw, 15px);
+  font-weight: 800;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  display: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  opacity: 0.0;
+}
+.show-counts .count-net { display: block; }
+
+/* Captured pieces */
+#captured {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 60px;
+}
+.captured-row {
+  display: flex;
+  gap: 2px;
+  font-size: 1.5rem;
+  min-height: 1.8em;
+}
+
+/* Check highlight */
+.square.in-check {
+  animation: check-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes check-pulse {
+  from { box-shadow: inset 0 0 8px 2px rgba(255,0,0,0.5); }
+  to   { box-shadow: inset 0 0 16px 6px rgba(255,0,0,0.8); }
+}
+
+/* Last move highlight */
+.square.last-from, .square.last-to {
+  background-color: rgba(233, 69, 96, 0.25) !important;
+}
