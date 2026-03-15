@@ -293,6 +293,86 @@ function applyMoveRaw(g, move) {
   }
 }
 
+// ── SAN Generation ───────────────────────────────────────────────────────────
+function moveToSAN(g, move) {
+  const p = g.board[move.from];
+  if (move.isCastle === 'k') return addCheckSuffix(g, move, 'O-O');
+  if (move.isCastle === 'q') return addCheckSuffix(g, move, 'O-O-O');
+
+  let san = '';
+  const isCapture = !!g.board[move.to] || move.isEnPassant;
+
+  if (p.type !== PAWN) {
+    san += p.type.toUpperCase();
+    // Disambiguation
+    const allMoves = generateMoves(g);
+    const ambiguous = allMoves.filter(m =>
+      m.to === move.to && m.from !== move.from &&
+      g.board[m.from] && g.board[m.from].type === p.type && g.board[m.from].color === p.color
+    );
+    if (ambiguous.length > 0) {
+      const sameFile = ambiguous.some(m => file(m.from) === file(move.from));
+      const sameRank = ambiguous.some(m => rank(m.from) === rank(move.from));
+      if (!sameFile) {
+        san += 'abcdefgh'[file(move.from)];
+      } else if (!sameRank) {
+        san += (8 - rank(move.from));
+      } else {
+        san += 'abcdefgh'[file(move.from)] + (8 - rank(move.from));
+      }
+    }
+  } else if (isCapture) {
+    san += 'abcdefgh'[file(move.from)];
+  }
+
+  if (isCapture) san += 'x';
+  san += 'abcdefgh'[file(move.to)] + (8 - rank(move.to));
+  if (move.promotion) san += '=' + move.promotion.toUpperCase();
+
+  return addCheckSuffix(g, move, san);
+}
+
+function addCheckSuffix(g, move, san) {
+  const copy = cloneGame(g);
+  applyMoveRaw(copy, move);
+  copy.turn = copy.turn === W ? B : W;
+  if (inCheck(copy, copy.turn)) {
+    const hasLegal = generateMoves(copy).length > 0;
+    san += hasLegal ? '+' : '#';
+  }
+  return san;
+}
+
+// ── Game Snapshots ───────────────────────────────────────────────────────────
+function snapshotGame(g) {
+  return {
+    board: g.board.map(p => p ? { color: p.color, type: p.type } : null),
+    turn: g.turn,
+    castling: { ...g.castling },
+    enPassant: g.enPassant,
+    halfMoves: g.halfMoves,
+    capturedWhite: g.capturedWhite.map(p => ({ ...p })),
+    capturedBlack: g.capturedBlack.map(p => ({ ...p })),
+    gameOver: g.gameOver,
+    winner: g.winner,
+  };
+}
+
+function restoreFromSnapshot(snap) {
+  return {
+    board: snap.board.map(p => p ? { ...p } : null),
+    turn: snap.turn,
+    castling: { ...snap.castling },
+    enPassant: snap.enPassant,
+    halfMoves: snap.halfMoves,
+    history: [],
+    capturedWhite: snap.capturedWhite.map(p => ({ ...p })),
+    capturedBlack: snap.capturedBlack.map(p => ({ ...p })),
+    gameOver: snap.gameOver,
+    winner: snap.winner,
+  };
+}
+
 function makeMove(g, move) {
   const p = g.board[move.from];
   const captured = g.board[move.to];

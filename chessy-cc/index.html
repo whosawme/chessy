@@ -13,6 +13,8 @@
     <div id="controls">
       <button id="heatmap-toggle">Threat Heatmap</button>
       <button id="counts-toggle">Show Counts</button>
+      <button id="delta-toggle">Show Delta</button>
+      <button id="flip-btn" title="Flip board">Flip Board</button>
       <button id="reset-btn">New Game</button>
     </div>
     <div id="legend" class="hidden">
@@ -20,15 +22,54 @@
       <div class="legend-bar"></div>
       <span class="legend-label black-label">Black controls</span>
     </div>
-    <div id="board-container">
-      <div id="board"></div>
-    </div>
-    <div id="captured">
-      <div id="captured-white" class="captured-row"></div>
-      <div id="captured-black" class="captured-row"></div>
+    <div id="main-area">
+      <div id="board-col">
+        <div id="captured-top" class="captured-row"></div>
+        <div id="board-container">
+          <div id="board"></div>
+        </div>
+        <div id="captured-bottom" class="captured-row"></div>
+      </div>
+      <div id="side-panels">
+        <div id="history-panel">
+          <h2>Moves</h2>
+          <div id="move-tree"></div>
+          <div id="history-nav">
+            <button id="nav-start" title="Start">|&lt;</button>
+            <button id="nav-prev" title="Back">&lt;</button>
+            <button id="nav-next" title="Next">&gt;</button>
+            <button id="nav-end" title="End">&gt;|</button>
+          </div>
+        </div>
+        <div id="study-panel" class="collapsed">
+          <button id="study-toggle-btn" class="panel-toggle">
+            <span class="toggle-arrow">&#9654;</span> Opening Study
+          </button>
+          <div id="study-body">
+            <div id="study-tabs">
+              <button class="study-tab active" data-tab="white">White Openings</button>
+              <button class="study-tab" data-tab="black">Black Openings</button>
+            </div>
+            <div id="study-list"></div>
+            <div id="study-controls" class="hidden">
+              <div id="study-name"></div>
+              <div id="study-moves-display"></div>
+              <div id="study-nav">
+                <button id="study-start" title="Start">|&lt;</button>
+                <button id="study-prev" title="Back">&lt;</button>
+                <button id="study-next" title="Next">&gt;</button>
+                <button id="study-end" title="End">&gt;|</button>
+              </div>
+              <div id="study-desc"></div>
+              <button id="study-exit">Back to List</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <script src="chess.js"></script>
+  <script src="openings.js"></script>
   <script src="ui.js"></script>
 </body>
 </html>
